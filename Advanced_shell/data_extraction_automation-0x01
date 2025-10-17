@@ -9,9 +9,9 @@ WEIGHT=$(jq '.weight' $FILE | awk '{printf "%d", $1/10}')
 TYPE=$(jq -r '.types[0].type.name' $FILE)
 
 # Capitalize only the first letter of the name and type
-cap_name="$(echo "${NAME:0:1}" | tr '[:lower:]' '[:upper:]')${NAME:1}"
+# cap_name="$(echo "${NAME:0:1}" | tr '[:lower:]' '[:upper:]')${NAME:1}"
 cap_type="$(echo "${TYPE:0:1}" | tr '[:lower:]' '[:upper:]')${TYPE:1}"
 
 
 
-echo "$cap_name is of type $cap_type, weighs ${WEIGHT}kg and is ${HEIGHT}m tall."
+echo "$NAME is of type $cap_type, weighs ${WEIGHT}kg, and is ${HEIGHT}m tall." | sed 's/\b\(.\)/\u\1/'
