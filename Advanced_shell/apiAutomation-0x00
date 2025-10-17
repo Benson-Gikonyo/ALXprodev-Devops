@@ -1,0 +1,27 @@
+#!/bin/bash
+# This script makes a request to the Pokémon API and retrieves data for a specific Pokémon Pikachu.
+
+# pokemon api  -pikachu
+API_URL="https://pokeapi.co/api/v2/pokemon/pikachu"
+
+DATA_FILE="data.json"
+ERROR_FILE="errors.txt"
+
+# make the api request with curl command, with the following flags:
+# -s = silent mode
+# -w "%{http_code}" = print HTTP status code after response
+# -o temp_response.txt = save response temporily to temp resp0nse.txt
+
+
+HTTP_CODE=$(curl -s -w "%{http_code}" -o temp_response.txt "$API_URL")
+
+if [[ $HTTP_CODE -ge 200 && $HTTP_CODE -lt 300 ]]; then
+    echo "Request Successful. Status Code: $HTTP_CODE"
+    mv temp_response.txt "$DATA_FILE"
+else
+    echo "Request Failed. Status Code: $HTTP_CODE"
+    echo "Error at $(date) - Status Code: $HTTP_CODE" >> "$ERROR_FILE"
+    cat temp_response.txt >> "$ERROR_FILE"
+    echo -e "\n----------------\n" >> "$ERROR_FILE"
+    rm temp_response.txt
+fi
