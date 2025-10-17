@@ -3,15 +3,15 @@
 
 FILE="data.json"
 
-NAME=$(jq -r '.name' $FILE)
-HEIGHT=$(jq '.height' $FILE | awk '{printf "%.1f", $1/10}')
-WEIGHT=$(jq '.weight' $FILE | awk '{printf "%d", $1/10}')
+name=$(jq -r '.name' $FILE)
+formatted_height=$(jq '.height' $FILE | awk '{printf "%.1f", $1/10}')
+formatted_weight=$(jq '.weight' $FILE | awk '{printf "%d", $1/10}')
 TYPE=$(jq -r '.types[0].type.name' $FILE)
 
 # Capitalize only the first letter of the name and type
 # cap_name="$(echo "${NAME:0:1}" | tr '[:lower:]' '[:upper:]')${NAME:1}"
-cap_type="$(echo "${TYPE:0:1}" | tr '[:lower:]' '[:upper:]')${TYPE:1}"
+type="$(echo "${TYPE:0:1}" | tr '[:lower:]' '[:upper:]')${TYPE:1}"
 
 
 
-echo "$NAME is of type $cap_type, weighs ${WEIGHT}kg, and is ${HEIGHT}m tall." | sed 's/\b\(.\)/\u\1/'
+echo "$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall." | sed 's/\b\(.\)/\u\1/'
