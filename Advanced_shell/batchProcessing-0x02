@@ -1,0 +1,27 @@
+#!/bin/bash
+# script that through a list of Pokémon [Bulbasaur, Ivysaur, Venusaur, Charmander, Charmeleon]
+# For each Pokémon, retrieve its data from the API and save it to a separate file named after the Pokémon (e.g., pikachu.json, bulbasaur.json…).
+
+pokemon_list=( "Bulbasaur" "Ivysaur" "Venasaur" "Charmander" "Charmeleon" )
+ERROR_FILE="errors.txt"
+
+for pokemon in "${pokemon_list[@]}"; do
+    echo "Fetching data for $pokemon..."
+    lcase_pokemon=$(echo "$pokemon" | tr '[:upper:]' '[:lower:]')
+
+    HTTP_CODE=$(curl -s -w "%{http_code}" -o temp_response.txt "https://pokeapi.co/api/v2/pokemon/$pokemon")
+
+    if [[ $HTTP_CODE -ge 200 && $HTTP_CODE -lt 300 ]]; then
+        mv temp_response.txt "$pokemon.json"
+        echo "Saved data to pokemon_data/$pokemon.json ✅"
+
+    else
+        echo "Request Failed. Status Code: $HTTP_CODE"
+        echo "Error at $(date) - Status Code: $HTTP_CODE" >> "$ERROR_FILE"
+        cat temp_response.txt >> "$ERROR_FILE"
+        echo -e "\n----------------\n" >> "$ERROR_FILE"
+        rm temp_response.txt
+    fi
+
+    sleep 1
+done
