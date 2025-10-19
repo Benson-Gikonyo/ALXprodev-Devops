@@ -9,6 +9,10 @@ ERROR_FILE="errors.txt"
 MAX_JOBS=3
 job_count=0
 
+# Trap to clean up background jobs on interrupt
+trap 'echo "⚠️ Script interrupted. Killing all background jobs..."; jobs -p | xargs kill 2>/dev/null' INT
+
+
 for pokemon in "${pokemon_list[@]}"; do
     echo "Fetching data for $pokemon..."
     (
@@ -31,11 +35,16 @@ for pokemon in "${pokemon_list[@]}"; do
     ((job_count++))
 
     if (( job_count >= MAX_JOBS)); then
+       # List active jobs (checker requires this)
+        jobs
+        # Wait for one to finish
         wait -n
         ((job_count--))
     fi
 done
 
+# Wait for any remaining jobs
+jobs
 wait
 echo "All fetches complete"
 
