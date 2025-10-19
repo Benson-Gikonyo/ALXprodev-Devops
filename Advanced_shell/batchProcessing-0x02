@@ -2,7 +2,7 @@
 # script that through a list of Pokémon [Bulbasaur, Ivysaur, Venusaur, Charmander, Charmeleon]
 # For each Pokémon, retrieve its data from the API and save it to a separate file named after the Pokémon (e.g., pikachu.json, bulbasaur.json…).
 
-pokemon_list=( "ivysaur" "venusaur" "charmander" "charmeleon" )
+pokemon_list=( "bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon" )
 ERROR_FILE="errors.txt"
 
 for pokemon in "${pokemon_list[@]}"; do

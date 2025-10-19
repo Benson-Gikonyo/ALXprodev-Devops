@@ -1,0 +1,38 @@
+#!/bin/bash
+# shell script that reads all the JSON files generated in Task 2 and extracts the name, height, and weight of each Pokémon.
+# Generate a CSV file containing the Pokémon’s name, height, and weight.
+
+file_list=( "bulbasaur.json" "charmander.json" "charmeleon.json" "ivysaur.json" "venusaur.json" )
+
+csv_file="pokemon_report.csv"
+sum_height=0
+sum_weight=0
+
+echo "Name,Height (m),Weight (kg)" > $csv_file
+
+for file in "${file_list[@]}"; do
+    if [ -e "$file" ]; then
+        name_raw=$(jq -r '.name' $file)
+        name="$(echo "${name_raw:0:1}" | tr '[:lower:]' '[:upper:]')${name_raw:1}"
+        formatted_height=$(jq '.height' $file| awk '{printf "%.1f", $1/10}')
+        formatted_weight=$(jq '.weight' $file | awk '{printf "%.1f", $1/10}')
+        echo "$name,$formatted_height,$formatted_weight" >> $csv_file
+    else
+        echo "file does not exist"
+    fi  
+done
+
+read avg_height avg_weight <<< $(awk -F, '
+NR>1 {sum_h+=$2; sum_w+=$3; n++}
+END {
+    if (n>0) {
+        printf "%.2f %.2f", sum_h/n, sum_w/n
+    }
+}' "$csv_file")
+
+echo -e "\n\n" >> $csv_file
+
+echo "Average Height: $avg_height m" >> $csv_file
+echo "Average Weight: $avg_weight kg" >> $csv_file
+
+
