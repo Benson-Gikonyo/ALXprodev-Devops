@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# script that fetches data for these Pokémon[Bulbasaur, Ivysaur, Venusaur, Charmander, Charmeleon ] in parallel by leveraging background processes and process management tools.
+# the script handles background processes properly and waits for all processes to complete before moving to the next step.
+
+pokemon_list=( "bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon" )
+ERROR_FILE="errors.txt"
+
+MAX_JOBS=3
+job_count=0
+
+for pokemon in "${pokemon_list[@]}"; do
+    echo "Fetching data for $pokemon..."
+    (
+        temp_file="temp_${pokemon}.txt"
+        HTTP_CODE=$(curl -s -w "%{http_code}" -o "$temp_file" "https://pokeapi.co/api/v2/pokemon/$pokemon")
+
+        if [[ $HTTP_CODE -ge 200 && $HTTP_CODE -lt 300 ]]; then
+            mv "$temp_file" "$pokemon.json"
+            echo "Saved data to pokemon_data/$pokemon.json ✅"
+
+        else
+            echo "Request Failed. Status Code: $HTTP_CODE"
+            echo "Error at $(date) - Status Code: $HTTP_CODE" >> "$ERROR_FILE"
+            cat temp_response.txt >> "$ERROR_FILE"
+            echo -e "\n----------------\n" >> "$ERROR_FILE"
+            rm temp_response.txt
+        fi
+    ) &
+
+    ((job_count++))
+
+    if (( job_count >= MAX_JOBS)); then
+        wait -n
+        ((job_count--))
+    fi
+done
+
+wait
+echo "All fetches complete"
+
+
+
